@@ -1,0 +1,26 @@
+{
+    "name": "pitmanware/kentron-illuminate",
+    "description": "Core Illuminate extension",
+    "license": "MIT",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Ben Pitman"
+        }
+    ],
+    "require": {
+        "illuminate/database": "^7.0",
+        "pitmanware/kentron": "^1.0"
+    },
+    "autoload": {
+        "psr-4" : {
+            "Kentron\\Illuminate\\" : "src"
+        }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/pitmanware/kentron.git"
+        }
+    ]
+}
