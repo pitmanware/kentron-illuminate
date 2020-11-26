@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Illuminate\Template;
+namespace Kentron\Template;
 
 use Illuminate\Database\Eloquent\Model;
 

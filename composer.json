@@ -10,7 +10,7 @@
     ],
     "require": {
         "illuminate/database": "^7.0",
-        "pitmanware/kentron": "^1.0"
+        "pitmanware/kentron": "^1.1"
     },
     "autoload": {
         "psr-4" : {

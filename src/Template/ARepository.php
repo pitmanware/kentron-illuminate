@@ -1,10 +1,10 @@
 <?php
 
-namespace Kentron\Illuminate\Template;
+namespace Kentron\Template;
 
 use Kentron\Template\AModel;
 
-use Kentron\Template\Entity\{ADBEntity, ACoreCollectionEntity};
+use Kentron\Entity\Template\{ADBEntity, ACoreCollectionEntity};
 
 abstract class ARepository
 {

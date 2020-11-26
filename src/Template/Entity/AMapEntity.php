@@ -1,9 +1,9 @@
 <?php
 
-namespace Kentron\Illuminate\Template\Entity;
+namespace Kentron\Entity\Template;
 
 use Kentron\Facade\DT;
-use Kentron\Template\Entity\AEntity;
+use Kentron\Entity\Template\AEntity;
 
 abstract class AMapEntity extends AEntity
 {
