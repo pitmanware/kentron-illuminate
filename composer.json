@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4" : {
-            "Kentron\\Illuminate\\" : "src"
+            "Kentron\\" : "src"
         }
     },
     "repositories": [
@@ -23,5 +23,8 @@
             "type": "vcs",
             "url": "https://github.com/pitmanware/kentron.git"
         }
+    ],
+    "bin": [
+        "bin/finks"
     ]
 }
