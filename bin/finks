@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+
+declare -rg -- SCRIPT_PATH=$(readlink -f "$0")
+declare -rg -- ROOT_DIR="${SCRIPT_PATH%/bin*}"
+declare -rg -- PHINX_DIR="${ROOT_DIR}/vendor/pitmanware/kentron-illuminate/src/Facade/Phinx"
+
+declare -g -- _config="$ROOT_DIR/phinx.php"
+declare -g -- _environment="dev"
+declare -g -- _template="${PHINX_DIR}/Skeleton.php"
+
+declare -Arg -- ENVIRONMENTS=(
+    ["dev"]=1
+    ["uat"]=1
+    ["live"]=1
+)
+
+error ()
+{
+    printf '\e[31;1mError:\e[0m %s\n' "$@" >&2
+    exit 1
+}
+
+usage ()
+{
+    cat << ____HELP
+
+Usage: vendor/bin/finks [-c FILE] [-e ENV] [-h] [-i] [-m] [-n NAME] [-r TIME] ...
+
+        -c FILE
+                specifies config file, default is ${_config#$PWD/}
+
+        -e ENV
+                specifies environment, defaults are <${!ENVIRONMENTS[*]}>
+
+        -h      displays this help text and exits
+
+        -i      init a new phinx config file
+
+        -m      run migrate
+
+        -n NAME
+                create new migration class
+
+        -r TIME
+                rollback to a timestamp
+
+        -t TEMPLATE
+                specifies template file, default is ${_template#$PWD/}
+
+____HELP
+    exit 0
+}
+
+setEnvironment ()
+{
+    local environment="${1,,}"
+
+    [[ -n "${ENVIRONMENTS[$environment]}" ]] || error "Invalid environment '$environment'"
+
+    _environment="$environment"
+}
+
+setConfig ()
+{
+    local -- config="$ROOT_DIR/$1"
+
+    [[ -s "$config" ]] || error "File '$config' does not exist or is empty"
+
+    _config="$config"
+}
+
+setConfig ()
+{
+    local -- template="$ROOT_DIR/$1"
+
+    [[ -s "$template" ]] || error "File '$template' does not exist or is empty"
+
+    _template="$template"
+}
+
+phinx ()
+{
+    ./vendor/bin/phinx $*
+}
+
+phinxInit ()
+{
+    phinx init
+}
+
+phinxCreate ()
+{
+    phinx create -c "$_config" -t "$_template"
+}
+
+while getopts ":c: :e: :t: :h :i :m :n: :r:" opt; do
+    case "${opt}" in
+        (h) {
+            usage
+        };;
+        (c) {
+            setConfig "${OPTARG#$PWD/}"
+        };;&
+        (e) {
+            setEnvironment "$OPTARG"
+        };;&
+        (t) {
+            setTemplate "${OPTARG#$PWD/}"
+        };;&
+        (i) {
+            phinxInit "$OPTARG"
+        };;
+        (m) {
+            phinxMigrate "$OPTARG"
+        };;
+        (n) {
+            phinxCreate "$OPTARG"
+        };;
+        (r) {
+            phinxRollback "$OPTARG"
+        };;
+        (\?) {
+            error "Invalid Option: -$OPTARG"
+        };;
+        (:) {
+            error "Invalid Option: -$OPTARG requires an argument"
+        };;
+    esac
+done
