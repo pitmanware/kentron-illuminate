@@ -11,7 +11,7 @@
     "require": {
         "robmorgan/phinx": "^0.12",
         "illuminate/database": "^8.24",
-        "pitmanware/kentron": "2.0"
+        "pitmanware/kentron": "^2.0"
     },
     "autoload": {
         "psr-4" : {
