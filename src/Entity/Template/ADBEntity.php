@@ -84,7 +84,7 @@ abstract class ADBEntity extends ACoreEntity
      * Sets default getters and setters for common table columns
      * @return void
      */
-    final private function setDefaultTableColumnMap (): void
+    private function setDefaultTableColumnMap (): void
     {
         if (
             isset($this->primaryIDColumn) &&
