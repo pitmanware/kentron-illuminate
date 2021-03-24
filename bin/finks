@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
-declare -rg -- SCRIPT_PATH=$(readlink -f "$0")
-declare -rg -- ROOT_DIR="${SCRIPT_PATH%/bin*}"
+declare -rg -- ROOT_DIR=${PWD}
 declare -rg -- PHINX_DIR="${ROOT_DIR}/vendor/pitmanware/kentron-illuminate/src/Facade/Phinx"
 
-declare -g -- _config="$ROOT_DIR/phinx.php"
+declare -g -- _config="${ROOT_DIR}/phinx.php"
 declare -g -- _environment="dev"
 declare -g -- _template="${PHINX_DIR}/Skeleton.php"
 
@@ -90,7 +89,7 @@ phinxInit ()
 
 phinxCreate ()
 {
-    phinx create -c "$_config" -t "$_template"
+    phinx create -c "$_config" -t "$_template" "$1"
 }
 
 while getopts ":c: :e: :t: :h :i :m :n: :r:" opt; do

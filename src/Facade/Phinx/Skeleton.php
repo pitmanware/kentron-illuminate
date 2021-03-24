@@ -1,10 +1,8 @@
 <?php
 
-$namespaceDefinition
+use Kentron\Facade\Phinx\Template\AMigration;
 
-use $useClassName;
-
-final class $className extends $baseClassName
+final class $className extends AMigration
 {
     /**
      * Migrate method
