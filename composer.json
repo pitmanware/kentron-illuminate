@@ -1,5 +1,6 @@
 {
     "name": "pitmanware/kentron-illuminate",
+    "version": "2.0.1",
     "description": "Core Illuminate extension",
     "license": "MIT",
     "minimum-stability": "stable",
