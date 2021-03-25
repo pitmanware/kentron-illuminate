@@ -51,8 +51,7 @@ abstract class ARepository
      */
     public function __construct ()
     {
-        if (is_null($this->modelClass) || !is_subclass_of($this->modelClass, AModel::class))
-        {
+        if (is_null($this->modelClass) || !is_subclass_of($this->modelClass, AModel::class)) {
             throw new \UnexpectedValueException("Model must be instance of " . AModel::class);
         }
 
@@ -75,15 +74,13 @@ abstract class ARepository
     /**
      * Inserts a new entry into the database using an ADBEntity
     *
-    * @param ADBEntity $entity [description]
+    * @param ADBEntity $entity
     */
-    public function insertNew (ADBEntity $entity): void
+    public function insertOne (ADBEntity $entity): void
     {
         // Loop through the attributes and set based on the key
-        foreach ($entity->iterateAvailableProperties(true) as $property => $value)
-        {
-            if ($property === $entity->getDateCreatedColumn())
-            {
+        foreach ($entity->iterateAvailableProperties(true) as $property => $value) {
+            if ($property === $entity->getDateCreatedColumn()) {
                 continue;
             }
 
@@ -93,6 +90,18 @@ abstract class ARepository
 
         // Save the new values to the entity
         $entity->build($this->toArray());
+    }
+
+    /**
+     * Inserts all entities in a collection into the database
+    *
+    * @param ACoreCollectionEntity $collectionEntity
+    */
+    public function insertMany (ACoreCollectionEntity $collectionEntity): void
+    {
+        foreach ($collectionEntity->iterateCoreEntities() as $aDBEntity) {
+            $this->insertOne($aDBEntity);
+        }
     }
 
     /**
@@ -106,8 +115,7 @@ abstract class ARepository
     {
         $result = $this->first();
 
-        if (is_null($result))
-        {
+        if (is_null($result)) {
             return false;
         }
 
@@ -127,8 +135,7 @@ abstract class ARepository
         $this->get();
         $results = $this->toArray();
 
-        if (count($results) === 0)
-        {
+        if (count($results) === 0) {
             return false;
         }
 
@@ -302,8 +309,7 @@ abstract class ARepository
     {
         $this->model = $this->model->first();
 
-        if (!$this->model)
-        {
+        if (!$this->model) {
             return null;
         }
 
@@ -478,8 +484,7 @@ abstract class ARepository
      */
     private function validateOperator (string $operator): void
     {
-        if (!in_array($operator, $this->operators))
-        {
+        if (!in_array($operator, $this->operators)) {
             throw new \InvalidArgumentException("'$operator' is not a valid operator");
         }
     }
