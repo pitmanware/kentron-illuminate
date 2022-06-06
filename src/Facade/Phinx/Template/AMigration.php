@@ -8,9 +8,11 @@ abstract class AMigration extends AbstractMigration
 {
     /**
      * Returns the length of the column provided
-     * @param  string   $table  The table in which the column belongs
-     * @param  string   $column The column in question
-     * @return null|int         Null if the table/column does not exist
+     * 
+     * @param string $table  The table in which the column belongs
+     * @param string $column The column in question
+     * 
+     * @return null|int Null if the table/column does not exist
      */
     protected function getColumnLength (string $table, string $column): ?int
     {

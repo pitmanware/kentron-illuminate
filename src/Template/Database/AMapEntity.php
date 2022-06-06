@@ -5,6 +5,9 @@ namespace Kentron\Entity\Template;
 use Kentron\Facade\DT;
 use Kentron\Entity\Template\AEntity;
 
+/**
+ * Model-like entity
+ */
 abstract class AMapEntity extends AEntity
 {
     protected $ID;

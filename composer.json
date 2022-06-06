@@ -1,6 +1,6 @@
 {
     "name": "pitmanware/kentron-illuminate",
-    "version": "2.0.3",
+    "version": "3.0",
     "description": "Core Illuminate extension",
     "license": "MIT",
     "minimum-stability": "stable",
@@ -11,8 +11,8 @@
     ],
     "require": {
         "robmorgan/phinx": "^0.12",
-        "illuminate/database": "^8.24",
-        "pitmanware/kentron": "^2.0"
+        "illuminate/database": "^9.0",
+        "pitmanware/kentron": "^3.0"
     },
     "autoload": {
         "psr-4" : {

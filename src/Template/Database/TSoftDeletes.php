@@ -1,6 +1,6 @@
 <?php
 
-namespace Kentron\Template;
+namespace Kentron\Template\Database;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
