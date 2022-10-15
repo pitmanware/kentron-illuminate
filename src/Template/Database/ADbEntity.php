@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Kentron\Template\Database;
 
+use \Error;
+
 // Services
 use Kentron\Facade\DT;
 use Kentron\Support\Type\Type;
@@ -13,26 +15,19 @@ use Kentron\Template\Entity\ACoreEntity;
 
 abstract class ADbEntity extends ACoreEntity
 {
-    /** Name of the table, needs to be overridden */
-    public const TABLE = "";
-    /** Name of the table primary column */
-    public const COLUMN_ID = "id";
-    /** Name of the table's created datetime column */
-    public const COLUMN_CREATED_AT = "created_at";
-    /** Name of the table's deleted datetime column */
-    public const COLUMN_DELETED_AT = "deleted_at";
-
     // DB props
     public int $id;
-    public DT|null $createdAt;
-    public DT|null $deletedAt;
+    public DT|null $createdAt = null;
+    public DT|null $updatedAt = null;
+    public DT|null $deletedAt = null;
+
+    protected static AModel|string $modelClass = AModel::class;
 
     public function __construct()
     {
-        // Set default getters and setters for common table columns
-        $this->addSetterAndGetter($this::COLUMN_ID);
-        $this->addSetterAndGetter($this::COLUMN_CREATED_AT);
-        $this->addSetterAndGetter($this::COLUMN_DELETED_AT);
+        foreach ($this->modelClass::getColumns() as $column) {
+            $this->addSetterAndGetter($column);
+        }
     }
 
     /**
@@ -96,12 +91,16 @@ abstract class ADbEntity extends ACoreEntity
     /**
      * Attach a getter/setter or prop binding to the $propertyMap
      *
-     * @param string $property
+     * @param string|null $property
      *
      * @return void
      */
-    private function addSetterAndGetter(string $property): void
+    private function addSetterAndGetter(?string $property): void
     {
+        if (is_null($property)) {
+            return;
+        }
+
         $pascal = str_replace('_', '', ucwords($property, '_'));
         $camel = lcfirst($pascal);
 
@@ -120,14 +119,14 @@ abstract class ADbEntity extends ACoreEntity
 
         if ($this->isValidMethod($getter)) {
             if (!Type::isAssoc($this->propertyMap)) {
-                throw new \Error("Property map for " . $this::class . " must be associative, or remove method {$getter}()");
+                throw new Error("Property map for " . $this::class . " must be associative, or remove method {$getter}()");
             }
 
             $this->propertyMap[$property]["get"] = $getter;
         }
         if ($this->isValidMethod($setter)) {
             if (!Type::isAssoc($this->propertyMap)) {
-                throw new \Error("Property map for " . $this::class . " must be associative, or remove method {$setter}()");
+                throw new Error("Property map for " . $this::class . " must be associative, or remove method {$setter}()");
             }
 
             $this->propertyMap[$property]["set"] = $setter;

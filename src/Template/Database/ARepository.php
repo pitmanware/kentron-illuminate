@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Kentron\Template\Database;
 
@@ -58,8 +59,7 @@ abstract class ARepository
 
     public function newEntity(): ADbEntity
     {
-        $entityClass = $this->dbEntity;
-        return new $entityClass();
+        return $this->model->newEntity();
     }
 
     public function newCollectionEntity(): ADbCollectionEntity
@@ -79,7 +79,7 @@ abstract class ARepository
         foreach ($dbEntity->iterateAvailableProperties(true) as $property => $value) {
 
             // Don't set null values or the "date created" column
-            if (is_null($value) || $property === $dbEntity::COLUMN_CREATED_AT) {
+            if (is_null($value) || $property === $this->model::C_CREATED_AT) {
                 continue;
             }
 
@@ -270,7 +270,7 @@ abstract class ARepository
      */
     public function whereId(int $id): void
     {
-        $this->where($this->dbEntity::COLUMN_ID, $id);
+        $this->where($this->model::C_ID, $id);
     }
 
     /**
@@ -282,7 +282,7 @@ abstract class ARepository
      */
     public function whereIdsIn(array $ids): void
     {
-        $this->whereIn($this->dbEntity::COLUMN_ID, $ids);
+        $this->whereIn($this->model::C_ID, $ids);
     }
 
     /**
@@ -294,7 +294,7 @@ abstract class ARepository
      */
     public function fromDateCreated(string $from): void
     {
-        $this->where($this->dbEntity::COLUMN_CREATED_AT, $from, ">=");
+        $this->where($this->model::C_CREATED_AT, $from, ">=");
     }
 
     /**
@@ -306,7 +306,7 @@ abstract class ARepository
      */
     public function toDateCreated(string $to): void
     {
-        $this->where($this->dbEntity::COLUMN_CREATED_AT, $to, "<");
+        $this->where($this->model::C_CREATED_AT, $to, "<");
     }
 
     /**
@@ -318,7 +318,7 @@ abstract class ARepository
      */
     public function fromDateDeleted(string $from): void
     {
-        $this->where($this->dbEntity::COLUMN_DELETED_AT, $from, ">=");
+        $this->where($this->model::C_DELETED_AT, $from, ">=");
     }
 
     /**
@@ -330,7 +330,7 @@ abstract class ARepository
      */
     public function toDateDeleted(string $to): void
     {
-        $this->where($this->dbEntity::COLUMN_DELETED_AT, $to, "<");
+        $this->where($this->model::C_DELETED_AT, $to, "<");
     }
 
     /**
