@@ -16,12 +16,6 @@ abstract class ARepository
     /** The model */
     protected AModel|Collection|Builder|null $model = null;
 
-    /** The FQDN of the hydratable entity */
-    protected AdbEntity|string $dbEntity;
-
-    /** The FQDN of the hydratable entity collection */
-    protected ADbCollectionEntity|string $dbEntityCollection;
-
     /** Any updates that need to be run */
     private array $updates = [];
 
@@ -57,15 +51,14 @@ abstract class ARepository
      * Entity Methods
      */
 
-    public function newEntity(): ADbEntity
+    public static function newEntity(): ADbEntity
     {
-        return $this->model->newEntity();
+        return static::$modelClass::newEntity();
     }
 
-    public function newCollectionEntity(): ADbCollectionEntity
+    public static function newCollectionEntity(): ADbCollectionEntity
     {
-        $entityCollectionClass = $this->dbEntityCollection;
-        return new $entityCollectionClass();
+        return static::$modelClass::newCollectionEntity();
     }
 
     /**
@@ -132,7 +125,7 @@ abstract class ARepository
             return null;
         }
 
-        $dbEntity ??= $this->newEntity();
+        $dbEntity ??= $this::newEntity();
         $dbEntity->hydrate($result);
 
         return $dbEntity;
@@ -154,7 +147,7 @@ abstract class ARepository
             return null;
         }
 
-        $collectionEntity ??= $this->newCollectionEntity();
+        $collectionEntity ??= $this::newCollectionEntity();
         $collectionEntity->hydrateCollection($results);
 
         return $collectionEntity;

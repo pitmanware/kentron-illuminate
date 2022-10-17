@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Kentron\Template\Database;
 
 use \Error;
+use \ReflectionType;
 
 // Services
 use Kentron\Facade\DT;
@@ -57,59 +58,40 @@ abstract class ADbEntity extends ACoreEntity
     }
 
     /**
-     * Getters
-     */
-
-    public function getCreatedAt(): ?DT
-    {
-        return $this->createdAt;
-    }
-
-    public function getDeletedAt(): ?DT
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * Setters
-     */
-
-    public function setCreatedAt(?string $createdAt): void
-    {
-        $this->createdAt = is_string($createdAt) ? DT::then($createdAt) : null;
-    }
-
-    public function setDeletedAt(?string $deletedAt): void
-    {
-        $this->deletedAt = is_string($deletedAt) ? DT::then($deletedAt) : null;
-    }
-
-    /**
      * Private methods
      */
 
     /**
      * Attach a getter/setter or prop binding to the $propertyMap
      *
-     * @param string|null $property
+     * @param string|null $column
      *
      * @return void
      */
-    private function addSetterAndGetter(?string $property): void
+    private function addSetterAndGetter(?string $column): void
     {
-        if (is_null($property)) {
+        if (is_null($column)) {
             return;
         }
 
-        $pascal = str_replace('_', '', ucwords($property, '_'));
+        // If this column has already been set in the DB map, skip it
+        if (isset($this->propertyMap[$column])) {
+            return;
+        }
+
+        $pascal = str_replace('_', '', ucwords($column, '_'));
         $camel = lcfirst($pascal);
 
-        if (property_exists($this, $camel)) {
-            if (Type::isAssoc($this->propertyMap)) {
-                $this->propertyMap[$property]["prop"] = $camel;
+        $reflectionProperty = $this->getReflectionClass()?->getProperty($camel);
+
+        // If the property exists and is public
+        if (!is_null($reflectionProperty) && $reflectionProperty->isPublic()) {
+            // If the property is typed
+            if ($reflectionProperty->getType() instanceof ReflectionType) {
+                $this->propertyMap[$column] = $camel;
             }
             else {
-                $this->propertyMap[$property] = $camel;
+                $this->propertyMap[$column]["prop"] = $camel;
             }
             return;
         }
@@ -122,14 +104,14 @@ abstract class ADbEntity extends ACoreEntity
                 throw new Error("Property map for " . $this::class . " must be associative, or remove method {$getter}()");
             }
 
-            $this->propertyMap[$property]["get"] = $getter;
+            $this->propertyMap[$column]["get"] = $getter;
         }
         if ($this->isValidMethod($setter)) {
             if (!Type::isAssoc($this->propertyMap)) {
                 throw new Error("Property map for " . $this::class . " must be associative, or remove method {$setter}()");
             }
 
-            $this->propertyMap[$property]["set"] = $setter;
+            $this->propertyMap[$column]["set"] = $setter;
         }
     }
 }
