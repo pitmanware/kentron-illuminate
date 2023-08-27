@@ -5,8 +5,11 @@ namespace Kentron\Template\Database;
 
 use Illuminate\Database\Eloquent\Model;
 
+use Kentron\Template\Database\ADbEntity;
+
 use \Error;
 use \ReflectionClass;
+use \ReflectionClassConstant;
 
 abstract class AModel extends Model
 {
@@ -17,16 +20,22 @@ abstract class AModel extends Model
     private const COLUMN_CONSTANT_PREFIX = "C_";
 
     /**
-     * Name of the table, needs to be overridden
+     * Name of the table, must be overridden
      * @var string
      */
     public const TABLE = "";
 
     /**
-     * Set the created and updates at timestamps
-     * @var string
+     * Use timestamps
+     * @var bool
      */
     public const TIMESTAMPS = true;
+
+    /**
+     * Use a custom date format for the timestamps
+     * @var string|null
+     */
+    public const DATE_FORMAT = null;
 
     /**
      * Name of the table primary column
@@ -42,13 +51,13 @@ abstract class AModel extends Model
 
     /**
      * Name of the table's updated datetime column
-     * @var string
+     * @var string|null
      */
     public const C_UPDATED_AT = null;
 
     /**
      * Name of the table's deleted datetime column
-     * @var string
+     * @var string|null
      */
     public const C_DELETED_AT = "deleted_at";
 
@@ -58,12 +67,12 @@ abstract class AModel extends Model
     /** Should be overridden with the child DB entity collection class */
     protected static ADbCollectionEntity|string $dbCollectionEntityClass = "";
 
-
     public function __construct()
     {
         $this->table = static::TABLE;
         $this->primaryKey = static::C_ID;
         $this->timestamps = static::TIMESTAMPS;
+        $this->dateFormat = static::DATE_FORMAT;
     }
 
     /**
@@ -106,16 +115,14 @@ abstract class AModel extends Model
     final public static function getColumns(): array
     {
         // Get all constants from the static class
-        $constants = (new ReflectionClass(static::class))->getConstants();
+        $constants = (new ReflectionClass(static::class))->getConstants(ReflectionClassConstant::IS_PUBLIC);
         // Filter them by those only that start with "C_" because that's the prefix we use for column name constants
         $constants = array_filter($constants, fn($constant) => str_starts_with($constant, self::COLUMN_CONSTANT_PREFIX), ARRAY_FILTER_USE_KEY);
 
         return array_values($constants);
     }
 
-    /**
-     * Overrides
-     */
+    // Overrides
 
     final public function getCreatedAtColumn(): ?string
     {

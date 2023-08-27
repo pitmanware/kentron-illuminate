@@ -5,10 +5,13 @@ namespace Kentron\Template\Database;
 
 use \Error;
 use \ReflectionType;
+use \UnitEnum;
+use \BackedEnum;
 
 // Services
 use Kentron\Facade\DT;
 use Kentron\Support\Type\Type;
+use Kentron\Support\Text;
 
 // Entities
 use Kentron\Template\Entity\AEntity;
@@ -16,11 +19,7 @@ use Kentron\Template\Entity\ACoreEntity;
 
 abstract class ADbEntity extends ACoreEntity
 {
-    // DB props
-    public int $id;
-    public DT|null $createdAt = null;
-    public DT|null $updatedAt = null;
-    public DT|null $deletedAt = null;
+    use TDbMap;
 
     protected static AModel|string $modelClass = AModel::class;
 
@@ -52,14 +51,18 @@ abstract class ADbEntity extends ACoreEntity
             if ($value instanceof DT) {
                 $value = $value->format();
             }
+            else if ($value instanceof BackedEnum) {
+                $value = $value->value;
+            }
+            else if ($value instanceof UnitEnum) {
+                $value = $value->name;
+            }
 
             yield $property => $value;
         }
     }
 
-    /**
-     * Private methods
-     */
+    // Private methods
 
     /**
      * Attach a getter/setter or prop binding to the $propertyMap
@@ -67,34 +70,23 @@ abstract class ADbEntity extends ACoreEntity
      * @param string|null $column
      *
      * @return void
+     *
+     * @throws Error if the getter/setter is not set
      */
     private function addSetterAndGetter(?string $column): void
     {
         if (is_null($column)) {
             return;
         }
-
         // If this column has already been set in the DB map, skip it
         if (isset($this->propertyMap[$column])) {
             return;
         }
 
-        $pascal = str_replace('_', '', ucwords($column, '_'));
-        $camel = lcfirst($pascal);
+        $this->propertyMap[$column] = [];
 
-        $reflectionProperty = $this->getReflectionClass()?->getProperty($camel);
-
-        // If the property exists and is public
-        if (!is_null($reflectionProperty) && $reflectionProperty->isPublic()) {
-            // If the property is typed
-            if ($reflectionProperty->getType() instanceof ReflectionType) {
-                $this->propertyMap[$column] = $camel;
-            }
-            else {
-                $this->propertyMap[$column]["prop"] = $camel;
-            }
-            return;
-        }
+        $transform = Text::transform($column)->from(Text::SNAKE);
+        $pascal = $transform->to(Text::PASCAL);
 
         $getter = "get{$pascal}";
         $setter = "set{$pascal}";
@@ -112,6 +104,23 @@ abstract class ADbEntity extends ACoreEntity
             }
 
             $this->propertyMap[$column]["set"] = $setter;
+        }
+
+        $camel = $transform->to(Text::LOWER|Text::CAMEL);
+        $reflectionProperty = $this->getReflectionClass()?->getProperty($camel);
+
+        // If the property exists and is public
+        if (!is_null($reflectionProperty) && $reflectionProperty->isPublic()) {
+            // If the property is typed
+            if ($reflectionProperty->getType() instanceof ReflectionType) {
+                // If the array is already associative, then we know a getter/setter has been attached
+                if (Type::isAssoc($this->propertyMap[$column])) {
+                    $this->propertyMap[$column]["prop"] = $camel;
+                }
+                else {
+                    $this->propertyMap[$column] = $camel;
+                }
+            }
         }
     }
 }

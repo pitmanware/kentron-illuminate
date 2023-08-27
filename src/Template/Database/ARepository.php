@@ -11,7 +11,7 @@ use Kentron\Facade\DT;
 abstract class ARepository
 {
     /** The FQDN of the model. Should be overriden */
-    protected AModel|string $modelClass;
+    protected static AModel|string $modelClass;
 
     /** The model */
     protected AModel|Collection|Builder|null $model = null;
@@ -40,7 +40,7 @@ abstract class ARepository
      */
     public function __construct()
     {
-        if (is_null($this->modelClass) || !is_subclass_of($this->modelClass, AModel::class)) {
+        if (is_null(static::$modelClass) || !is_subclass_of(static::$modelClass, AModel::class)) {
             throw new \UnexpectedValueException("Model must be instance of " . AModel::class);
         }
 
@@ -92,7 +92,6 @@ abstract class ARepository
 
         // Save the new values to the entity
         $dbEntity->hydrate($this->toArray());
-        $this->entityDef = $dbEntity;
     }
 
     /**
@@ -367,12 +366,12 @@ abstract class ARepository
 
     public function updateCreatedAt(string $createdAt): void
     {
-        $this->where($this->entityDef::COLUMN_CREATED_AT, $createdAt, ">=");
+        $this->where(static::$modelClass::C_CREATED_AT, $createdAt, ">=");
     }
 
     public function updateDeletedAt(string $deletedAt): void
     {
-        $this->where($this->entityDef::COLUMN_DELETED_AT, $deletedAt, ">=");
+        $this->where(static::$modelClass::C_DELETED_AT, $deletedAt, ">=");
     }
 
     /**
@@ -489,7 +488,7 @@ abstract class ARepository
      */
     public function resetOrmModel(): void
     {
-        $this->model = new $this->modelClass;
+        $this->model = new static::$modelClass;
     }
 
     /**

@@ -8,9 +8,7 @@ use Kentron\Template\Entity\AEntity;
 
 abstract class ADbCollectionEntity extends ACoreCollectionEntity
 {
-    /**
-     * Overrides
-     */
+    // Overrides
 
     /**
      * @return ADbEntity
