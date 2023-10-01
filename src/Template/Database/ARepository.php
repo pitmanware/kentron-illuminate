@@ -48,8 +48,13 @@ abstract class ARepository
     }
 
     /**
-     * Entity Methods
+     * Getters
      */
+
+    public static function getModelClass(): string|AModel
+    {
+        return self::$modelClass;
+    }
 
     public static function newEntity(): ADbEntity
     {
