@@ -13,6 +13,8 @@ use \ReflectionClassConstant;
 
 abstract class AModel extends Model
 {
+    use TSoftDeletes;
+
     /**
      * Prefix given to all constants for columns
      * @var string
